@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "81504454499",
+    "project_id": "race-timer-tracker",
+    "storage_bucket": "race-timer-tracker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:81504454499:android:23f8370c2db0f93ef97556",
+        "android_client_info": {
+          "package_name": "com.example.race_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAobDDgUtGAbbAjWQhCVPaMAhqZ5_J0NyU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
