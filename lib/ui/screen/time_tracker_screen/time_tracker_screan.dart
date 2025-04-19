@@ -13,8 +13,9 @@ class _TimeTrackerScreenState extends State<TimeTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: TrackerTheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: TrackerTheme.background,
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

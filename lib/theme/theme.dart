@@ -10,6 +10,7 @@ class TrackerTheme {
   static Color black = const Color(0xFF000000);
   static Color grey = const Color(0xFF808080);
   static Color lightGrey = const Color(0xFFD3D3D3);
+  static Color background = const Color(0xFFF6F8FA);
 }
 
 class AppTextStyles {
