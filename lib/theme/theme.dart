@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
 class TrackerTheme {
-  static Color primary = const Color(0x001d61e7);
-  static Color secondary = const Color(0x004b81ec);
-  static Color green = const Color(0x00001f40);
-  static Color orange = const Color(0x00FFA500);
-  static Color red = const Color(0x00FF0000);
-  static Color white = const Color(0x00FFFFFF);
-  static Color black = const Color(0x00000000);
-  static Color grey = const Color(0x00808080);
-  static Color lightGrey = const Color(0x00D3D3D3);
-  
-
+  static Color primary = const Color(0xFF1D61E7);  
+  static Color secondary = const Color(0xFF4B81EC);
+  static Color green = const Color(0xFF001F40);
+  static Color orange = const Color(0xFFFFA500);
+  static Color red = const Color(0xFFFF0000);      
+  static Color white = const Color(0xFFFFFFFF);
+  static Color black = const Color(0xFF000000);
+  static Color grey = const Color(0xFF808080);
+  static Color lightGrey = const Color(0xFFD3D3D3);
 }
+
 
 class AppTextStyles {
   static TextStyle heading =
@@ -50,6 +49,6 @@ class DertamSize {
 /// Definition of App Theme.
 ///
 ThemeData appTheme = ThemeData(
-  fontFamily: 'Eesti',
-  scaffoldBackgroundColor: Colors.white,
+  fontFamily: 'Poppins',
+  scaffoldBackgroundColor: TrackerTheme.white,
 );
