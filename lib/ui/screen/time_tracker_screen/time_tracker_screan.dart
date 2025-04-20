@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../theme/theme.dart';
 import '../../widget/tab_bar.dart';
+import 'cycle_segment.dart';
+import 'run_segment.dart';
+import 'swim_segment.dart';
 
 class TimeTrackerScreen extends StatefulWidget {
   const TimeTrackerScreen({super.key});
@@ -49,11 +52,7 @@ class _TimeTrackerScreenState extends State<TimeTrackerScreen> {
           ),
         ),
         body: TabBarView(
-          children: const [
-            Center(child: Text('Swim')),
-            Center(child: Text('Cycle')),
-            Center(child: Text('Run')),
-          ],
+          children: const [SwimSegment(), CycleSegment(), RunSegment()],
         ),
       ),
     );
