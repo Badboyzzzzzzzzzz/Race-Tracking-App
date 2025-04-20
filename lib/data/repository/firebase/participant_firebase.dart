@@ -28,7 +28,7 @@ class ParticipantFirebase extends ParticipantRepository {
       throw Exception('Failed to add participant');
     }
     final newID = jsonDecode(response.body)['name'];
-    return Participant(id: newID, name: name, bib: bib, status: status);
+    return Participant(id: newID, name: name, bibNumber: bib, status: status);
   }
 
   @override

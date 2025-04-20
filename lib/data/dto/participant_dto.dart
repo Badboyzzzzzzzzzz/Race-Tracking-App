@@ -5,7 +5,7 @@ class ParticipantDto {
     return Participant(
       id: id,
       name: json['name'],
-      bib: json['bib'],
+      bibNumber: json['bibNumber'],
       status: json['status'],
     );
   }
@@ -13,7 +13,7 @@ class ParticipantDto {
   static Map<String, dynamic> toJson(Participant participant) {
     return {
       'name': participant.name,
-      'bib': participant.bib,
+      'bibNumber': participant.bibNumber,
       'status': participant.status,
     };
   }
