@@ -37,7 +37,7 @@ class _SwimSegmentState extends State<SwimSegment>
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: AppSpacings.xxl),
+        const SizedBox(height: AppSpacings.l),
         CustomTimer(
           controller: _controller,
           builder: (state, time) {

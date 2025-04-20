@@ -14,14 +14,14 @@ class BibList extends StatelessWidget {
           shrinkWrap: true,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            childAspectRatio: 1.2,
+            childAspectRatio: 109 / 59,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
           ),
           itemBuilder: (context, index) {
             return BibCard(index: index);
           },
-          itemCount: 10,
+          itemCount: 12,
         ),
       ),
     );

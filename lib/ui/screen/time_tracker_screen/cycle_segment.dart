@@ -1,10 +1,110 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchBar;
+import 'package:custom_timer/custom_timer.dart';
+import 'widgets/bib_list.dart';
+import 'widgets/search_bar.dart';
 
-class CycleSegment extends StatelessWidget {
+import '../../../theme/theme.dart';
+
+class CycleSegment extends StatefulWidget {
   const CycleSegment({super.key});
 
   @override
+  State<CycleSegment> createState() => _CycleSegmentState();
+}
+
+class _CycleSegmentState extends State<CycleSegment>
+    with SingleTickerProviderStateMixin {
+  late CustomTimerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = CustomTimerController(
+      vsync: this,
+      begin: const Duration(hours: 0),
+      end: const Duration(hours: 24),
+      initialState: CustomTimerState.reset,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(children: [Text('Cycle')]);
+    return Column(
+      children: [
+        const SizedBox(height: AppSpacings.l),
+        CustomTimer(
+          controller: _controller,
+          builder: (state, time) {
+            return Text(
+              "${time.hours}:${time.minutes}:${time.seconds}:${time.milliseconds}",
+              style: AppTextStyles.heading,
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () => _controller.start(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TrackerTheme.green,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Start',
+                style: AppTextStyles.button.copyWith(color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              onPressed: () => _controller.pause(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TrackerTheme.orange,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Pause',
+                style: AppTextStyles.button.copyWith(color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              onPressed: () => _controller.reset(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TrackerTheme.red,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Reset',
+                style: AppTextStyles.button.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacings.xxl),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SearchBar(),
+        ),
+        const SizedBox(height: AppSpacings.xxl),
+        const BibList(),
+      ],
+    );
   }
 }
