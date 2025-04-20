@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide SearchBar;
 import 'package:custom_timer/custom_timer.dart';
+import 'widgets/bib_list.dart';
 import 'widgets/search_bar.dart';
 
 import '../../../theme/theme.dart';
@@ -101,6 +102,8 @@ class _SwimSegmentState extends State<SwimSegment>
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: SearchBar(),
         ),
+        const SizedBox(height: AppSpacings.xxl),
+        const BibList(),
       ],
     );
   }
