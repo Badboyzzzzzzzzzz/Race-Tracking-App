@@ -59,6 +59,6 @@ class DertamSize {
 /// Definition of App Theme.
 ///
 ThemeData appTheme = ThemeData(
-  fontFamily: 'Eesti',
+  fontFamily: 'Poppins',
   scaffoldBackgroundColor: Colors.white,
 );
