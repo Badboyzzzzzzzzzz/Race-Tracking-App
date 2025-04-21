@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class TrackerTheme {
   static Color primary = const Color(0xFF1d61e7);
   static Color secondary = const Color(0xFF4b81ec);
-  static Color green = const Color(0xFF001f40);
+  static Color green = const Color(0xFF008000);
   static Color orange = const Color(0xFFFFA500);
   static Color red = const Color(0xFFFF0000);
   static Color white = const Color(0xFFFFFFFF);
@@ -59,6 +59,6 @@ class DertamSize {
 /// Definition of App Theme.
 ///
 ThemeData appTheme = ThemeData(
-  fontFamily: 'Eesti',
+  fontFamily: 'Poppins',
   scaffoldBackgroundColor: Colors.white,
 );
