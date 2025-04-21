@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:race_tracker/data/repository/firebase/participant_firebase.dart';
 import 'package:race_tracker/data/repository/participant_repository.dart';
 import 'package:race_tracker/model/participant.dart';
 import 'package:race_tracker/ui/provider/async_values.dart';
 
 class ParticipantProvider extends ChangeNotifier {
-  final ParticipantRepository _participantRepository = ParticipantFirebase();
+  final ParticipantRepository participantRepository;
   AsyncValue<List<Participant>> _participants = AsyncValue.empty();
+  ParticipantProvider({required this.participantRepository}) {
+    fetchParticipants();
+  }
 
   // Getter for participants
   AsyncValue<List<Participant>> get participants => _participants;
@@ -16,7 +18,7 @@ class ParticipantProvider extends ChangeNotifier {
       _participants = AsyncValue.loading();
       notifyListeners();
 
-      final participants = await _participantRepository.getParticipants();
+      final participants = await participantRepository.getParticipants();
       _participants = AsyncValue.success(participants);
       notifyListeners();
     } catch (error) {
@@ -25,22 +27,18 @@ class ParticipantProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addParticipant(Participant participant) async {
-    await _participantRepository.addParticipant(
-      participant.bibNumber,
-      participant.name,
-      participant.status,
-    );
+  Future<void> addParticipant(String bibNumber, String name) async {
+    await participantRepository.addParticipant(bibNumber, name);
     notifyListeners();
   }
 
   Future<void> removeParticipant(Participant participant) async {
-    await _participantRepository.removeParticipant(participant);
+    await participantRepository.removeParticipant(participant);
     notifyListeners();
   }
 
   Future<void> updateParticipant(Participant participant) async {
-    await _participantRepository.updateParticipant(participant);
+    await participantRepository.updateParticipant(participant);
     notifyListeners();
   }
 }

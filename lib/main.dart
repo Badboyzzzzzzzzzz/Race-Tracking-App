@@ -1,12 +1,27 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:race_tracker/data/repository/firebase/participant_firebase.dart';
 import 'package:race_tracker/firebase_options.dart';
-import 'package:race_tracker/ui/screens/time_tracker_screen/time_tracker_screen.dart';
+import 'package:race_tracker/ui/provider/participant_provider.dart';
+import 'package:race_tracker/ui/screens/participant_management/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create:
+              (context) => ParticipantProvider(
+                participantRepository: ParticipantRepositoryFirebase(),
+              ),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,10 +31,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
       title: 'Race Timer',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: Text(''),
+      home: const ParticipantManagementScreen(),
     );
   }
 }

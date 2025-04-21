@@ -3,13 +3,11 @@ class Participant {
   final String id;
   final String bibNumber;
   final String name;
-  final ParticipantStatus status;
   Map<String, DateTime?> segmentTimes; // Stores start/end times for each segment
   String currentSegment;
 
   Participant({
     required this.id,
-    required this.status,
     required this.bibNumber,
     required this.name,
     Map<String, DateTime?>? segmentTimes,
@@ -51,4 +49,3 @@ class Participant {
   }
 }
 
-enum ParticipantStatus { notStarted, started, finished }
