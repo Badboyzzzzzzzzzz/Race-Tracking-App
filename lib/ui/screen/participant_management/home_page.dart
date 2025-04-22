@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:race_tracker/ui/widget/navigation_bar.dart';
 import '../../widget/participant_card.dart';
 import '../../widget/input_field.dart';
 import '../../widget/add_participants_button.dart';
@@ -19,6 +20,7 @@ class _ParticipantManagementScreenState
   final List<Map<String, String>> _participants = [];
   String? _idError;
   String? _nameError;
+  int _currentIndex = 0;
 
   @override
   void dispose() {
@@ -89,11 +91,75 @@ class _ParticipantManagementScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: TrackerTheme.background,
+        elevation: 0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'RaceTimer',
+              style: AppTextStyles.heading.copyWith(
+                color: TrackerTheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(
+              height: kToolbarHeight,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.contain,
+                  errorBuilder:
+                      (_, __, ___) =>
+                          Icon(Icons.error, color: TrackerTheme.red),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: TrackerTheme.primary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      'BIB',
+                      style: AppTextStyles.title.copyWith(
+                        color: TrackerTheme.white,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: Text(
+                      'Name',
+                      style: AppTextStyles.title.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 40),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -102,30 +168,23 @@ class _ParticipantManagementScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Input ID
                       InputField(
                         controller: _idController,
                         hintText: 'ID',
                         showBorder: true,
                       ),
-                      SizedBox(
-                        height: 20,
-                        child:
-                            _idError != null
-                                ? Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 4,
-                                    left: 12,
-                                  ),
-                                  child: Text(
-                                    _idError!,
-                                    style: TextStyle(
-                                      color: TrackerTheme.red,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                )
-                                : const SizedBox.shrink(),
-                      ),
+                      if (_idError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4, left: 12),
+                          child: Text(
+                            _idError!,
+                            style: TextStyle(
+                              color: TrackerTheme.red,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -135,30 +194,23 @@ class _ParticipantManagementScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Input Name
                       InputField(
                         controller: _nameController,
                         hintText: 'Name',
                         showBorder: true,
                       ),
-                      SizedBox(
-                        height: 20,
-                        child:
-                            _nameError != null
-                                ? Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 4,
-                                    left: 12,
-                                  ),
-                                  child: Text(
-                                    _nameError!,
-                                    style: TextStyle(
-                                      color: TrackerTheme.red,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                )
-                                : const SizedBox.shrink(),
-                      ),
+                      if (_nameError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4, left: 12),
+                          child: Text(
+                            _nameError!,
+                            style: TextStyle(
+                              color: TrackerTheme.red,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -167,7 +219,7 @@ class _ParticipantManagementScreenState
               ],
             ),
             const SizedBox(height: 16),
-            // Scrollable list of ParticipantCards
+
             Expanded(
               child:
                   _participants.isEmpty
@@ -187,6 +239,10 @@ class _ParticipantManagementScreenState
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (idx) => setState(() => _currentIndex = idx),
       ),
     );
   }
