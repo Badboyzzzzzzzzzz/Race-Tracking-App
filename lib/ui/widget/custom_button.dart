@@ -22,9 +22,7 @@ class _CustomButtonState extends State<CustomButton> {
 
   @override
   Widget build(BuildContext context) {
-    Color bgColor = isHovered
-        ? widget.color.withOpacity(0.9) 
-        : widget.color;
+    Color bgColor = isHovered ? widget.color.withOpacity(0.9) : widget.color;
 
     return MouseRegion(
       onEnter: (_) {
@@ -48,7 +46,7 @@ class _CustomButtonState extends State<CustomButton> {
           style: AppTextStyles.button.copyWith(
             color: TrackerTheme.white,
             fontWeight: FontWeight.bold,
-            ),
+          ),
         ),
       ),
     );
