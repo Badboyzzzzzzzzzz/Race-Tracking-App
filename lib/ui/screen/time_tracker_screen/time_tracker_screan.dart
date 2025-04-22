@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/theme.dart';
 import '../../widget/tab_bar.dart';
-import '../../widget/navigation_bar.dart';
 
 class TimeTrackerScreen extends StatefulWidget {
   const TimeTrackerScreen({super.key});
@@ -56,7 +55,6 @@ class _TimeTrackerScreenState extends State<TimeTrackerScreen> {
             Center(child: Text('Run')),
           ],
         ),
-        bottomNavigationBar: const CustomNavigationBar(),
       ),
     );
   }

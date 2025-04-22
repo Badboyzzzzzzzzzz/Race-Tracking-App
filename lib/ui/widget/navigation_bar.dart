@@ -1,22 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import '../../theme/theme.dart';
 
 class CustomNavigationBar extends StatelessWidget {
-  const CustomNavigationBar({super.key});
+  final int currentIndex;
+  final Function(int) onTap;
+
+  const CustomNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       backgroundColor: TrackerTheme.white,
       selectedItemColor: TrackerTheme.primary,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
+      currentIndex: currentIndex,
+      onTap: onTap,
+      items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.watch_later_outlined),
+          icon: Icon(HugeIcons.strokeRoundedHome11),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(HugeIcons.strokeRoundedTime03),
           label: 'Timing',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Results'),
+        BottomNavigationBarItem(
+          icon: Icon(HugeIcons.strokeRoundedGoogleDoc),
+          label: 'Results',
+        ),
       ],
     );
   }
