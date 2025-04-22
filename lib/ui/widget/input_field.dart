@@ -1,4 +1,3 @@
-// lib/ui/widget/input_field.dart
 import 'package:flutter/material.dart';
 import 'package:race_tracker/theme/theme.dart';
 

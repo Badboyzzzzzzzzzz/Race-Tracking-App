@@ -1,4 +1,3 @@
-// lib/ui/widget/participant_card.dart
 import 'package:flutter/material.dart';
 import 'package:race_tracker/theme/theme.dart';
 
@@ -19,7 +18,6 @@ class ParticipantCard extends StatelessWidget {
     return Container(
       // padding around content
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      // white background, blue border, rounded corners, subtle shadow
       decoration: BoxDecoration(
         color: TrackerTheme.white,
         borderRadius: BorderRadius.circular(10),
