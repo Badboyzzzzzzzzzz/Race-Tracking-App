@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import '../../../model/result.dart';
 import '../../../theme/theme.dart';
 import 'widgets/result_table.dart';
@@ -29,6 +30,10 @@ class ResultScreen extends StatelessWidget {
       ),
     ];
 
+    Future<void> handleRefresh() async {
+      await Future.delayed(const Duration(seconds: 2));
+    }
+
     return Scaffold(
       backgroundColor: TrackerTheme.background,
       appBar: AppBar(
@@ -57,9 +62,17 @@ class ResultScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ResultTable(results: sampleResults),
+      body: LiquidPullToRefresh(
+        onRefresh: handleRefresh,
+        color: TrackerTheme.background,
+        height: 200,
+        backgroundColor: TrackerTheme.primary,
+        animSpeedFactor: 2,
+        showChildOpacityTransition: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ResultTable(results: sampleResults),
+        ),
       ),
     );
   }
