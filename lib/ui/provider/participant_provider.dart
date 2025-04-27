@@ -27,9 +27,30 @@ class ParticipantProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addParticipant(String bibNumber, String name) async {
-    await participantRepository.addParticipant(bibNumber, name);
-    notifyListeners();
+  Future<bool> addParticipant(String bibNumber, String name) async {
+    try {
+      // Check for duplicate BIB number
+      await fetchParticipants();
+      final isDuplicate =
+          _participants.data?.any((p) => p.bibNumber == bibNumber) ??
+          false;
+      if (isDuplicate) {
+        _participants = AsyncValue.error(
+          'BIB number $bibNumber already exists',
+        );
+        notifyListeners();
+        return false;
+      }
+
+      // If no duplicate, proceed with adding
+      await participantRepository.addParticipant(bibNumber, name);
+      await fetchParticipants(); // Refresh the list
+      return true;
+    } catch (e) {
+      _participants = AsyncValue.error(e.toString());
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<void> removeParticipant(Participant participant) async {

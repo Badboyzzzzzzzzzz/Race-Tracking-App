@@ -1,4 +1,6 @@
 // lib/ui/widget/input_field.dart
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:race_tracker/theme/theme.dart';
 
@@ -6,12 +8,18 @@ class InputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final bool showBorder;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final TextCapitalization textCapitalization;
 
   const InputField({
     super.key,
     required this.controller,
     required this.hintText,
-    this.showBorder = true,
+    this.showBorder = false,
+    this.validator,
+    this.keyboardType,
+    this.textCapitalization = TextCapitalization.none,
   });
 
   @override
@@ -29,18 +37,18 @@ class InputField extends StatelessWidget {
             offset: const Offset(0, 2),
           ),
         ],
-        border: showBorder
-            ? Border.all(color: TrackerTheme.grey, width: 1)
-            : null,
+        border:
+            showBorder ? Border.all(color: TrackerTheme.grey, width: 1) : null,
       ),
       // The actual TextField
-      child: TextField(
+      child: TextFormField(
+        validator: validator,
         controller: controller,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: TrackerTheme.grey),
           isDense: true,
-          border: InputBorder.none, 
+          border: InputBorder.none,
           contentPadding: EdgeInsets.zero,
         ),
       ),

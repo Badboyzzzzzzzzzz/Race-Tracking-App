@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:race_tracker/model/participant.dart';
+import 'package:race_tracker/theme/theme.dart';
 import 'package:race_tracker/ui/provider/async_values.dart';
 import 'package:race_tracker/ui/provider/participant_provider.dart';
 import 'package:race_tracker/ui/widgets/add_participant_button.dart';
 import 'package:race_tracker/ui/widgets/input_field.dart';
+import 'package:race_tracker/ui/widgets/navigation_bar.dart';
 import 'package:race_tracker/ui/widgets/participant_card.dart';
 
 class ParticipantManagementScreen extends StatefulWidget {
@@ -19,6 +21,7 @@ class ParticipantManagementScreen extends StatefulWidget {
 
 class _ParticipantManagementScreenState
     extends State<ParticipantManagementScreen> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _bibNumberController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
 
@@ -29,16 +32,56 @@ class _ParticipantManagementScreenState
     super.dispose();
   }
 
-  void _addParticipant(BuildContext context) async {
-    final bibNumber = _bibNumberController.text.trim();
-    final name = _nameController.text.trim();
-    await context.read<ParticipantProvider>().addParticipant(bibNumber,name);
-    await context
-        .read<ParticipantProvider>()
-        .fetchParticipants(); // Refresh list
+  String? _validateBibNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'BIB number is required';
+    }
 
-    _bibNumberController.clear();
-    _nameController.clear();
+    final numericRegex = RegExp(r'^\d+$');
+    if (!numericRegex.hasMatch(value)) {
+      return 'BIB number must be an integer';
+    }
+
+    return null;
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name is required';
+    }
+    if (value.length < 2) {
+      return 'Name must be at least 2 characters';
+    }
+    return null;
+  }
+
+  void _addParticipant(BuildContext context) async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final bibNumber = _bibNumberController.text.trim();
+      final name = _nameController.text.trim();
+
+      final success = await context.read<ParticipantProvider>().addParticipant(
+        bibNumber,
+        name,
+      );
+
+      if (!mounted) return;
+
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('BIB number $bibNumber already exists'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Clear form only after successful addition
+
+      _bibNumberController.clear();
+      _nameController.clear();
+    }
   }
 
   void _removeParticipant(BuildContext context, Participant p) async {
@@ -83,63 +126,99 @@ class _ParticipantManagementScreenState
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: TrackerTheme.white,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Participant Management',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: TrackerTheme.primary,
+                  ),
+                ),
+                Image.asset('assets/images/logo.png', width: 100, height: 100),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: TrackerTheme.primary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
                 children: [
-                  const Text(
-                    'Participant Management',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      'BIB',
+                      style: AppTextStyles.title.copyWith(
+                        color: TrackerTheme.white,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
-                  Image.asset(
-                    'assets/images/logo.png',
-                    width: 100,
-                    height: 100,
+                  Expanded(
+                    flex: 5,
+                    child: Text(
+                      'Name',
+                      style: AppTextStyles.title.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 40),
+                ],
+              ),
+            ),
+
+            // Input Row
+            SizedBox(height: 16),
+
+            Form(
+              key: _formKey,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: InputField(
+                      validator: _validateBibNumber,
+                      controller: _bibNumberController,
+                      hintText: 'ID',
+                      showBorder: true,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 5,
+                    child: InputField(
+                      validator: _validateName,
+                      controller: _nameController,
+                      hintText: 'Name',
+                      showBorder: true,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  AddParticipantsButton(
+                    label: 'Add',
+                    onPressed: () => _addParticipant(context),
                   ),
                 ],
               ),
-
-            // Input Row
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: InputField(
-                    controller: _bibNumberController,
-                    hintText: 'ID',
-                    showBorder: true,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 5,
-                  child: InputField(
-                    controller: _nameController,
-                    hintText: 'Name',
-                    showBorder: true,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                AddParticipantsButton(
-                  label: 'Add',
-                  onPressed: () => _addParticipant(context),
-                ),
-              ],
             ),
             const SizedBox(height: 16),
             Expanded(child: content),
           ],
         ),
       ),
+      bottomNavigationBar: Navigationbar(currentIndex: 0),
     );
   }
 }
