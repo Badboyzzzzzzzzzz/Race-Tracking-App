@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:race_tracker/theme/theme.dart';
 import 'package:race_tracker/ui/provider/async_values.dart';
 import 'package:race_tracker/ui/provider/participant_provider.dart';
-import 'package:race_tracker/ui/provider/race_status_provider.dart';
 import 'package:race_tracker/ui/provider/segment_result_provider.dart';
+import 'package:race_tracker/ui/screens/time_tracker_screen/widget/bib_button.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/widget/search_bar.dart';
 import 'package:race_tracker/ui/widgets/custom_button.dart';
 
@@ -32,37 +32,11 @@ class _RunSegmentScreenState extends State<RunSegment> {
   void initState() {
     super.initState();
     _startTimer();
-    // Load existing swim segment results and status
+    // Load existing swim segment results
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final segmentProvider = context.read<SegmentResultProvider>();
-      final raceStatusProvider = context.read<RaceStatusProvider>();
-
       // Load segment results
       await segmentProvider.fetchSegmentResults('run');
-
-      // Load race status
-      await raceStatusProvider.loadSegmentStatus('run');
-      final status = raceStatusProvider.currentStatus;
-
-      if (status != null) {
-        setState(() {
-          if (status.startTime != null) {
-            // Calculate elapsed time since start
-            final now = DateTime.now();
-            final elapsed = now.difference(status.startTime!);
-            // Reset and start stopwatch, then let it run for the elapsed duration
-            _stopwatch.reset();
-            _stopwatch.start();
-            while (_stopwatch.elapsed < elapsed) {
-              // Wait until we reach the correct elapsed time
-            }
-          }
-
-          if (status.isCompleted) {
-            _stopwatch.stop();
-          }
-        });
-      }
     });
   }
 
@@ -190,7 +164,6 @@ class _RunSegmentScreenState extends State<RunSegment> {
   Widget build(BuildContext context) {
     final participantProvider = context.watch<ParticipantProvider>();
     final getParticipants = participantProvider.participants;
-    final raceStatusProvider = context.watch<RaceStatusProvider>();
     final segmentProvider = context.watch<SegmentResultProvider>();
     final results = segmentProvider.segmentResults;
 
@@ -256,7 +229,7 @@ class _RunSegmentScreenState extends State<RunSegment> {
                   mainAxisSpacing: 8,
                   childAspectRatio: 1.8,
                   children:
-                      getParticipants.data!.map((bib) {
+                      (getParticipants.data ?? []).map((bib) {
                         return BibButton(
                           bib: bib.bibNumber,
                           color: getBibColor(bib.bibNumber),
@@ -283,7 +256,6 @@ class _RunSegmentScreenState extends State<RunSegment> {
                 color: TrackerTheme.primary,
                 onPressed: () async {
                   if (!_stopwatch.isRunning) {
-                    await raceStatusProvider.startSegment('run');
                     setState(() {
                       _stopwatch.start();
                     });
@@ -297,7 +269,6 @@ class _RunSegmentScreenState extends State<RunSegment> {
                 text: 'Finished',
                 color: TrackerTheme.grey,
                 onPressed: () async {
-                  await raceStatusProvider.completeSegment('run');
                   setState(() {
                     _stopwatch.stop();
                     _updateDisplay();
@@ -307,56 +278,6 @@ class _RunSegmentScreenState extends State<RunSegment> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class BibButton extends StatelessWidget {
-  final String bib;
-  final Color color;
-  final VoidCallback onTap;
-  final VoidCallback onLongPress;
-  final String finishTime;
-
-  const BibButton({
-    super.key,
-    required this.bib,
-    required this.color,
-    required this.onTap,
-    required this.onLongPress,
-    this.finishTime = '',
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onTap,
-      onLongPress: onLongPress,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: EdgeInsets.zero,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            bib,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          if (finishTime.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              finishTime,
-              style: const TextStyle(fontSize: 12, color: Colors.white),
-            ),
-          ],
-        ],
       ),
     );
   }

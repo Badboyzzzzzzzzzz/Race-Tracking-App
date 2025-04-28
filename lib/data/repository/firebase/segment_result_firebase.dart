@@ -31,7 +31,6 @@ class SegmentResultRepositoryFirebase implements SegmentResultRepository {
             bibNumber: bibNumber,
             segmentName: segmentName,
             duration: duration,
-            confirmedBibs: [],
           ),
         ),
       ),

@@ -7,7 +7,6 @@ class SegmentResultDto {
       bibNumber: json['bibNumber'] as String,
       segmentName: json['segmentName'] as String,
       duration: Duration(microseconds: json['duration'] as int),
-      confirmedBibs: json['confirmedBibs'] as List<String>,
     );
   }
 
@@ -16,7 +15,6 @@ class SegmentResultDto {
       'bibNumber': segmentResult.bibNumber,
       'segmentName': segmentResult.segmentName,
       'duration': segmentResult.duration.inMicroseconds,
-      'confirmedBibs': segmentResult.confirmedBibs,
     };
   }
 }

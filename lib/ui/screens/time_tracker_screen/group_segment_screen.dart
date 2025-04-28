@@ -45,7 +45,7 @@ class TimerScreen extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).size.height * 0.20,
+              bottom: (MediaQuery.maybeOf(context)?.size.height ?? 0) * 0.20,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
