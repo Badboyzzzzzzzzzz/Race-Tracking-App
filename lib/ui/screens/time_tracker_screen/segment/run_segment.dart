@@ -143,7 +143,6 @@ class _RunSegmentScreenState extends State<RunSegment> {
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     final milliseconds = twoDigitsMs(duration.inMilliseconds.remainder(1000));
-
     return '$hours:$minutes:$seconds.$milliseconds';
   }
 

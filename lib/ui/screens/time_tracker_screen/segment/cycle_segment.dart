@@ -181,6 +181,7 @@ class _CycleSegmentScreenState extends State<CycleSegment> {
   Widget build(BuildContext context) {
     final participantProvider = context.watch<ParticipantProvider>();
     final getParticipants = participantProvider.participants;
+    
     Widget content;
     switch (getParticipants.state) {
       case AsyncValueState.loading:
