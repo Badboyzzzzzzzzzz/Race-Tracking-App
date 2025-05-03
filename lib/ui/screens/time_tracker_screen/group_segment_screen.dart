@@ -13,92 +13,107 @@ class TimerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: TrackerTheme.background,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: TrackerTheme.background,
-        elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Timer',
-              style: AppTextStyles.heading.copyWith(
-                color: TrackerTheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(
-              height: kToolbarHeight,
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: TrackerTheme.background,
+      //   elevation: 0,
+      //   title: Padding(
+      //     padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+      //     child: Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Text(
+      //           'Race Timer Screen',
+      //           style: TextStyle(
+      //             fontSize: 24,
+      //             fontWeight: FontWeight.bold,
+      //             color: TrackerTheme.primary,
+      //           ),
+      //         ),
+      //         Image.asset('assets/images/logo.png', width: 100, height: 100),
+      //       ],
+      //     ),
+      //   ),
+      // ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: (MediaQuery.maybeOf(context)?.size.height ?? 0) * 0.20,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 80,
-                  child: CustomButton(
-                    text: 'Swim',
-                    color: TrackerTheme.primary,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SwimSegment()),
-                      );
-                    },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Race Timer Screen',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: TrackerTheme.primary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacings.l),
-                SizedBox(
-                  width: double.infinity,
-                  height: 80,
-                  child: CustomButton(
-                    text: 'Cycle',
-                    color: TrackerTheme.primary,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => CycleSegment()),
-                      );
-                    },
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 100,
+                    height: 100,
                   ),
+                ],
+              ),
+              const SizedBox(height: AppSpacings.l),
+              const SizedBox(height: AppSpacings.l),
+              const SizedBox(height: AppSpacings.l),
+              const SizedBox(height: AppSpacings.l),
+              const SizedBox(height: AppSpacings.l),
+
+              SizedBox(
+                width: double.infinity,
+                height: 80,
+                child: CustomButton(
+                  text: 'Swim',
+                  color: TrackerTheme.primary,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SwimSegment()),
+                    );
+                  },
                 ),
-                const SizedBox(height: AppSpacings.l),
-                SizedBox(
-                  width: double.infinity,
-                  height: 80,
-                  child: CustomButton(
-                    text: 'Run',
-                    color: TrackerTheme.primary,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RunSegment()),
-                      );
-                    },
-                  ),
+              ),
+              const SizedBox(height: AppSpacings.l),
+              SizedBox(
+                width: double.infinity,
+                height: 80,
+                child: CustomButton(
+                  text: 'Cycle',
+                  color: TrackerTheme.primary,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CycleSegment()),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: AppSpacings.l),
+              SizedBox(
+                width: double.infinity,
+                height: 80,
+                child: CustomButton(
+                  text: 'Run',
+                  color: TrackerTheme.primary,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RunSegment()),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
+
       bottomNavigationBar: Navigationbar(currentIndex: 1),
     );
   }

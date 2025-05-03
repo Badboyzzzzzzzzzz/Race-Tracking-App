@@ -3,7 +3,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:race_tracker/model/participant.dart' show Participant;
 import 'package:race_tracker/theme/theme.dart';
+import 'package:race_tracker/ui/provider/async_values.dart';
 import 'package:race_tracker/ui/provider/participant_provider.dart';
 import 'package:race_tracker/ui/provider/segment_result_provider.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/widget/bib_button.dart';
@@ -26,6 +28,7 @@ class _CycleSegmentScreenState extends State<CycleSegment> {
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _timer;
   String _timeDisplay = '00:00:00.00';
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -37,9 +40,13 @@ class _CycleSegmentScreenState extends State<CycleSegment> {
     if (confirmedBibs.contains(bib)) {
       return TrackerTheme.primary;
     } else if (preselectedBibs.contains(bib)) {
-      return TrackerTheme.primary; // Blue when selected
+      return TrackerTheme.primary;
+
+      /// Blue when selected
     } else {
-      return TrackerTheme.grey; // Light grey when not selected
+      return Colors.grey[400]!;
+
+      /// Light grey when not selected
     }
   }
 
@@ -74,19 +81,19 @@ class _CycleSegmentScreenState extends State<CycleSegment> {
     final segmentProvider = context.read<SegmentResultProvider>();
     setState(() {
       if (confirmedBibs.contains(bib)) {
-        // If already confirmed, do nothing on tap
+        // If already confirmed it can do nothing
         return;
       }
       if (preselectedBibs.contains(bib)) {
-        // Second tap → confirm and save result
+        // Second tap confirm and save the pariticipant result
         preselectedBibs.remove(bib);
         confirmedBibs.add(bib);
         finishTimes[bib] = DateTime.now();
         elapsedTimes[bib] = _stopwatch.elapsed;
-        // Save the result to Firebase
+        // Save the the participant result to Firebase
         segmentProvider.addResult(bib, name, 'cycle', _stopwatch.elapsed);
       } else {
-        // First tap → preselect
+        // First tap preselect on the bib number
         preselectedBibs.add(bib);
       }
     });
@@ -127,7 +134,7 @@ class _CycleSegmentScreenState extends State<CycleSegment> {
           elapsedTimes.remove(bib);
         });
 
-        // Delete the result from Firebase
+        // Delete the participant result from Firebase
         await segmentProvider.deleteResult(bib, 'cycle');
       }
     }
@@ -150,10 +157,66 @@ class _CycleSegmentScreenState extends State<CycleSegment> {
     return '';
   }
 
+  List<Participant> _getFilteredParticipants(
+    List<Participant> allParticipants,
+  ) {
+    if (_searchQuery.isEmpty) {
+      return allParticipants;
+    }
+    return allParticipants.where((participant) {
+      final bibMatch = participant.bibNumber.toLowerCase().contains(
+        _searchQuery.toLowerCase(),
+      );
+      return bibMatch;
+    }).toList();
+  }
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final participantProvider = context.watch<ParticipantProvider>();
     final getParticipants = participantProvider.participants;
+    Widget content;
+    switch (getParticipants.state) {
+      case AsyncValueState.loading:
+        content = const Center(child: CircularProgressIndicator());
+        break;
+      case AsyncValueState.error:
+        content = Center(child: Text('Error: ${getParticipants.error}'));
+        break;
+      case AsyncValueState.success:
+        content = GridView.count(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 1.8,
+          children:
+              _getFilteredParticipants(getParticipants.data!).map((
+                participant,
+              ) {
+                return BibButton(
+                  bib: participant.bibNumber,
+                  color: getBibColor(participant.bibNumber),
+                  onTap:
+                      () => _handleBibTap(
+                        participant.bibNumber,
+                        participant.name,
+                      ),
+                  onLongPress: () => _handleBibLongPress(participant.bibNumber),
+                  finishTime: getParticipantTime(participant.bibNumber),
+                );
+              }).toList(),
+        );
+      case AsyncValueState.empty:
+        content = const Center(child: Text('No participants found.'));
+        break;
+    }
+
     return Scaffold(
       backgroundColor: TrackerTheme.white,
       body: SafeArea(
@@ -198,27 +261,10 @@ class _CycleSegmentScreenState extends State<CycleSegment> {
               ),
               const SizedBox(height: 16),
               // Search bar
-              SearchBibBar(),
+              SearchBibBar(onChanged: _updateSearchQuery),
               const SizedBox(height: 16),
               // BIB numbers
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 1.8,
-                  children:
-                      (getParticipants.data ?? []).map((bib) {
-                        return BibButton(
-                          bib: bib.bibNumber,
-                          color: getBibColor(bib.bibNumber),
-                          onTap: () => _handleBibTap(bib.bibNumber, bib.name),
-                          onLongPress: () => _handleBibLongPress(bib.bibNumber),
-                          finishTime: getParticipantTime(bib.bibNumber),
-                        );
-                      }).toList(),
-                ),
-              ),
+              Expanded(child: content),
 
               // Bottom buttons
             ],

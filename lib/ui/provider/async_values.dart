@@ -4,7 +4,6 @@ class AsyncValue<T> {
   final T? data;
   
   final Object? error;
-  
   final AsyncValueState state;
 
   AsyncValue._({this.data, this.error, required this.state});

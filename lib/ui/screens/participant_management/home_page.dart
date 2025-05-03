@@ -71,7 +71,7 @@ class _ParticipantManagementScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('BIB number $bibNumber already exists'),
-            backgroundColor: Colors.red,
+            backgroundColor: TrackerTheme.red,
           ),
         );
         return;
@@ -187,6 +187,7 @@ class _ParticipantManagementScreenState
                   Expanded(
                     flex: 2,
                     child: InputField(
+                      keyboardType: TextInputType.number,
                       validator: _validateBibNumber,
                       controller: _bibNumberController,
                       hintText: 'ID',

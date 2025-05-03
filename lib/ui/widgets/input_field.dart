@@ -42,6 +42,7 @@ class InputField extends StatelessWidget {
       ),
       // The actual TextField
       child: TextFormField(
+        keyboardType: keyboardType,
         validator: validator,
         controller: controller,
         decoration: InputDecoration(

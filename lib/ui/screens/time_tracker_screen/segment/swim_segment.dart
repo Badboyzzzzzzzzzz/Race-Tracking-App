@@ -3,7 +3,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:race_tracker/model/participant.dart';
 import 'package:race_tracker/theme/theme.dart';
+import 'package:race_tracker/ui/provider/async_values.dart';
 import 'package:race_tracker/ui/provider/participant_provider.dart';
 import 'package:race_tracker/ui/provider/segment_result_provider.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/widget/bib_button.dart';
@@ -27,6 +29,7 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _timer;
   String _timeDisplay = '00:00:00.00';
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -76,19 +79,20 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
 
     setState(() {
       if (confirmedBibs.contains(bib)) {
-        // If already confirmed, do nothing on tap
+        /// if already confirm return nothing
         return;
       }
       if (preselectedBibs.contains(bib)) {
-        // Second tap → confirm and save result
+        /// Second tap confirm to save the participant result
         preselectedBibs.remove(bib);
         confirmedBibs.add(bib);
         finishTimes[bib] = DateTime.now();
         elapsedTimes[bib] = _stopwatch.elapsed;
-        // Save the result to Firebase
+
+        /// save pariticipant result to firebase
         segmentProvider.addResult(bib, name, 'swim', _stopwatch.elapsed);
       } else {
-        // First tap → preselect
+        /// First tap preselect
         preselectedBibs.add(bib);
       }
     });
@@ -97,7 +101,6 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
   void _handleBibLongPress(String bib) async {
     if (confirmedBibs.contains(bib)) {
       final segmentProvider = context.read<SegmentResultProvider>();
-
       // Show confirmation dialog
       final shouldUntrack = await showDialog<bool>(
         context: context,
@@ -129,7 +132,7 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
           elapsedTimes.remove(bib);
         });
 
-        // Delete the result from Firebase
+        // Delete the participant result from Firebase
         await segmentProvider.deleteResult(bib, 'swim');
       }
     }
@@ -138,12 +141,10 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String twoDigitsMs(int n) => (n ~/ 10).toString().padLeft(2, '0');
-
     final hours = twoDigits(duration.inHours);
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     final milliseconds = twoDigitsMs(duration.inMilliseconds.remainder(1000));
-
     return '$hours:$minutes:$seconds.$milliseconds';
   }
 
@@ -154,10 +155,66 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
     return '';
   }
 
+  List<Participant> _getFilteredParticipants(
+    List<Participant> allParticipants,
+  ) {
+    if (_searchQuery.isEmpty) {
+      return allParticipants;
+    }
+    return allParticipants.where((participant) {
+      final bibMatch = participant.bibNumber.toLowerCase().contains(
+        _searchQuery.toLowerCase(),
+      );
+      return bibMatch;
+    }).toList();
+  }
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final participantProvider = context.watch<ParticipantProvider>();
     final getParticipants = participantProvider.participants;
+
+    Widget content;
+    switch (getParticipants.state) {
+      case AsyncValueState.loading:
+        content = const Center(child: CircularProgressIndicator());
+        break;
+      case AsyncValueState.error:
+        content = Center(child: Text('Error: ${getParticipants.error}'));
+        break;
+      case AsyncValueState.success:
+        content = GridView.count(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 1.8,
+          children:
+              _getFilteredParticipants(getParticipants.data!).map((
+                participant,
+              ) {
+                return BibButton(
+                  bib: participant.bibNumber,
+                  color: getBibColor(participant.bibNumber),
+                  onTap:
+                      () => _handleBibTap(
+                        participant.bibNumber,
+                        participant.name,
+                      ),
+                  onLongPress: () => _handleBibLongPress(participant.bibNumber),
+                  finishTime: getParticipantTime(participant.bibNumber),
+                );
+              }).toList(),
+        );
+      case AsyncValueState.empty:
+        content = const Center(child: Text('No participants found.'));
+        break;
+    }
 
     return Scaffold(
       backgroundColor: TrackerTheme.white,
@@ -203,28 +260,11 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
               ),
               const SizedBox(height: 16),
               // Search bar
-              SearchBibBar(),
+              SearchBibBar(onChanged: _updateSearchQuery),
               const SizedBox(height: 16),
 
               // BIB numbers
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 1.8,
-                  children:
-                      (getParticipants.data ?? []).map((bib) {
-                        return BibButton(
-                          bib: bib.bibNumber,
-                          color: getBibColor(bib.bibNumber),
-                          onTap: () => _handleBibTap(bib.bibNumber, bib.name),
-                          onLongPress: () => _handleBibLongPress(bib.bibNumber),
-                          finishTime: getParticipantTime(bib.bibNumber),
-                        );
-                      }).toList(),
-                ),
-              ),
+              Expanded(child: content),
 
               // Bottom buttons
             ],
