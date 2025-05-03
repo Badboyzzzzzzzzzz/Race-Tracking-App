@@ -8,7 +8,6 @@ class ParticipantDto {
       bibNumber: json['bibNumber'] ?? '',
     );
   }
-
   static Map<String, dynamic> toJson(Participant participant) {
     return {'name': participant.name, 'bibNumber': participant.bibNumber};
   }

@@ -1,4 +1,4 @@
-import 'package:race_tracker/model/segment_result.dart';
+import 'package:race_tracker/model/race_result.dart';
 
 class SegmentResultDto {
   static SegmentResult fromJson(String id, Map<String, dynamic> json) {
@@ -7,6 +7,7 @@ class SegmentResultDto {
       bibNumber: json['bibNumber'] as String,
       segmentName: json['segmentName'] as String,
       duration: Duration(microseconds: json['duration'] as int),
+      name: json['name'] as String,
     );
   }
 
@@ -15,6 +16,7 @@ class SegmentResultDto {
       'bibNumber': segmentResult.bibNumber,
       'segmentName': segmentResult.segmentName,
       'duration': segmentResult.duration.inMicroseconds,
+      'name': segmentResult.name,
     };
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:race_tracker/theme/theme.dart';
 
 class BibButton extends StatelessWidget {
   final String bib;
@@ -31,17 +32,17 @@ class BibButton extends StatelessWidget {
         children: [
           Text(
             bib,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: TrackerTheme.white,
             ),
           ),
           if (finishTime.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               finishTime,
-              style: const TextStyle(fontSize: 12, color: Colors.white),
+              style: TextStyle(fontSize: 12, color: TrackerTheme.white),
             ),
           ],
         ],

@@ -22,8 +22,7 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider(
           create:
-              (context) =>
-                  SegmentResultProvider(SegmentResultRepositoryFirebase()),
+              (context) => SegmentResultProvider(SegmentResultRepositoryFirebase()),
         ),
       ],
       child: const MyApp(),

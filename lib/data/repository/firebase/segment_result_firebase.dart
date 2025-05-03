@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:race_tracker/data/dto/segment_result_dto.dart';
 import 'package:race_tracker/data/repository/segment_result_repository.dart';
-import 'package:race_tracker/model/segment_result.dart';
+import 'package:race_tracker/model/race_result.dart';
 
 class SegmentResultRepositoryFirebase implements SegmentResultRepository {
   static const String baseUrl =
@@ -17,6 +17,7 @@ class SegmentResultRepositoryFirebase implements SegmentResultRepository {
   @override
   Future<void> addSegmentResult(
     String bibNumber,
+    String name,
     String segmentName,
     Duration duration,
   ) async {
@@ -29,6 +30,7 @@ class SegmentResultRepositoryFirebase implements SegmentResultRepository {
           SegmentResult(
             id: path,
             bibNumber: bibNumber,
+            name: name,
             segmentName: segmentName,
             duration: duration,
           ),
@@ -51,28 +53,9 @@ class SegmentResultRepositoryFirebase implements SegmentResultRepository {
     }
   }
 
-  @override
-  Future<List<SegmentResult>> getParticipantResults(String bibNumber) async {
-    final response = await http.get(
-      Uri.parse(
-        '$baseUrl/$segmentResultsCollection.json?orderBy="\$key"&startAt="$bibNumber"&endAt="$bibNumber\\uf8ff"',
-      ),
-    );
-
-    if (response.statusCode != HttpStatus.ok) {
-      throw Exception('Failed to get participant results');
-    }
-
-    final data = jsonDecode(response.body) as Map<String, dynamic>?;
-    if (data == null) return [];
-
-    return data.values
-        .map((result) => SegmentResultDto.fromJson(result.key, result.value))
-        .toList();
-  }
 
   @override
-  Future<List<SegmentResult>> getSegmentResults(String segmentName) async {
+  Future<List<SegmentResult>> getSegmentResults() async {
     final response = await http.get(
       Uri.parse('$baseUrl/$segmentResultsCollection.json'),
     );
@@ -84,27 +67,23 @@ class SegmentResultRepositoryFirebase implements SegmentResultRepository {
     final data = jsonDecode(response.body) as Map<String, dynamic>?;
     if (data == null) return [];
 
-    return data.values
-        .map((result) => SegmentResultDto.fromJson(result.key, result.value))
-        .where((result) => result.segmentName == segmentName)
+    return data.entries
+        .where((entry) => entry.value is Map<String, dynamic>)
+        .map((entry) {
+          try {
+            return SegmentResultDto.fromJson(
+              entry.key,
+              entry.value as Map<String, dynamic>,
+            );
+          } catch (e) {
+            // Optionally log or handle the error
+            return null;
+          }
+        })
+        .where((result) => result != null)
+        .cast<SegmentResult>()
         .toList();
   }
 
-  @override
-  Future<SegmentResult?> getSpecificResult(
-    String bibNumber,
-    String segmentName,
-  ) async {
-    final path = _getSegmentResultPath(bibNumber, segmentName);
-    final response = await http.get(Uri.parse('$baseUrl/$path.json'));
 
-    if (response.statusCode != HttpStatus.ok) {
-      throw Exception('Failed to get specific result');
-    }
-
-    final data = jsonDecode(response.body) as Map<String, dynamic>?;
-    if (data == null) return null;
-
-    return SegmentResultDto.fromJson(data.keys.first, data.values.first);
-  }
 }

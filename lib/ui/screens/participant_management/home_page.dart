@@ -178,10 +178,8 @@ class _ParticipantManagementScreenState
                 ],
               ),
             ),
-
             // Input Row
             SizedBox(height: 16),
-
             Form(
               key: _formKey,
               child: Row(

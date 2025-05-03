@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:race_tracker/ui/screens/time_tracker_screen/widget/cycle_segment.dart';
-import 'package:race_tracker/ui/screens/time_tracker_screen/widget/run_segment.dart';
-import 'package:race_tracker/ui/screens/time_tracker_screen/widget/swim_segment.dart';
+import 'package:race_tracker/ui/screens/time_tracker_screen/segment/cycle_segment.dart';
+import 'package:race_tracker/ui/screens/time_tracker_screen/segment/run_segment.dart';
+import 'package:race_tracker/ui/screens/time_tracker_screen/segment/swim_segment.dart';
 import 'package:race_tracker/ui/widgets/custom_button.dart';
 import 'package:race_tracker/ui/widgets/navigation_bar.dart';
 import '../../../theme/theme.dart';

@@ -41,6 +41,8 @@ dependencies:
   iconsax: ^0.0.8
   custom_timer: ^0.2.3
   shared_preferences: ^2.5.3
+  liquid_pull_to_refresh: ^3.0.1
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

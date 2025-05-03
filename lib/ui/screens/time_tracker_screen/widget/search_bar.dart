@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:race_tracker/theme/theme.dart';
 
 class SearchBibBar extends StatelessWidget {
   final Function(String)? onChanged;
   final String? hintText;
-
   const SearchBibBar({
     super.key,
     this.onChanged,
     this.hintText = 'Search BIB Number',
   });
-
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: TrackerTheme.white,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
@@ -28,6 +27,7 @@ class SearchBibBar extends StatelessWidget {
       ),
       child: TextField(
         onChanged: onChanged,
+        keyboardType: TextInputType.number,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),

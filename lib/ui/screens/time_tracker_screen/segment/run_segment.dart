@@ -4,22 +4,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:race_tracker/theme/theme.dart';
-import 'package:race_tracker/ui/provider/async_values.dart';
 import 'package:race_tracker/ui/provider/participant_provider.dart';
 import 'package:race_tracker/ui/provider/segment_result_provider.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/widget/bib_button.dart';
-// import 'package:race_tracker/ui/screens/time_tracker_screen/time_tracker_screen.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/widget/search_bar.dart';
 import 'package:race_tracker/ui/widgets/custom_button.dart';
 
-class SwimSegment extends StatefulWidget {
-  const SwimSegment({super.key});
+class RunSegment extends StatefulWidget {
+  const RunSegment({super.key});
 
   @override
-  State<SwimSegment> createState() => _SwimSegmentScreenState();
+  State<RunSegment> createState() => _RunSegmentScreenState();
 }
 
-class _SwimSegmentScreenState extends State<SwimSegment> {
+class _RunSegmentScreenState extends State<RunSegment> {
   List<String> preselectedBibs = [];
   List<String> confirmedBibs = [];
   Map<String, DateTime> finishTimes = {};
@@ -33,12 +31,6 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
   void initState() {
     super.initState();
     _startTimer();
-    // Load existing swim segment results
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final segmentProvider = context.read<SegmentResultProvider>();
-      // Load segment results
-      await segmentProvider.fetchSegmentResults('swim');
-    });
   }
 
   Color getBibColor(String bib) {
@@ -78,7 +70,7 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
     _timeDisplay = '$hours:$minutes:$seconds.$milliseconds';
   }
 
-  void _handleBibTap(String bib) async {
+  void _handleBibTap(String bib, String name) async {
     final segmentProvider = context.read<SegmentResultProvider>();
 
     setState(() {
@@ -93,7 +85,7 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
         finishTimes[bib] = DateTime.now();
         elapsedTimes[bib] = _stopwatch.elapsed;
         // Save the result to Firebase
-        segmentProvider.addResult(bib, 'swim', _stopwatch.elapsed);
+        segmentProvider.addResult(bib, name, 'run', _stopwatch.elapsed);
       } else {
         // First tap → preselect
         preselectedBibs.add(bib);
@@ -137,7 +129,7 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
         });
 
         // Delete the result from Firebase
-        await segmentProvider.deleteResult(bib, 'swim');
+        await segmentProvider.deleteResult(bib, 'run');
       }
     }
   }
@@ -165,15 +157,6 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
   Widget build(BuildContext context) {
     final participantProvider = context.watch<ParticipantProvider>();
     final getParticipants = participantProvider.participants;
-    final segmentProvider = context.watch<SegmentResultProvider>();
-    final results = segmentProvider.segmentResults;
-
-    // Restore confirmed bibs from segment results
-    if (results.state == AsyncValueState.success && confirmedBibs.isEmpty) {
-      for (var result in results.data!) {
-        confirmedBibs.add(result.bibNumber);
-      }
-    }
 
     return Scaffold(
       backgroundColor: TrackerTheme.white,
@@ -193,7 +176,7 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    'Swim',
+                    'Run',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -234,7 +217,7 @@ class _SwimSegmentScreenState extends State<SwimSegment> {
                         return BibButton(
                           bib: bib.bibNumber,
                           color: getBibColor(bib.bibNumber),
-                          onTap: () => _handleBibTap(bib.bibNumber),
+                          onTap: () => _handleBibTap(bib.bibNumber, bib.name),
                           onLongPress: () => _handleBibLongPress(bib.bibNumber),
                           finishTime: getParticipantTime(bib.bibNumber),
                         );

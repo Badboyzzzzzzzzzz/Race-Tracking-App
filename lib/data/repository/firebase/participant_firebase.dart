@@ -14,17 +14,26 @@ class ParticipantRepositoryFirebase extends ParticipantRepository {
       '$baseUrl/$participantCollection.json';
 
   @override
-  Future<Participant> addParticipant(String bibNumber, String name) async {
+  Future<Participant> addParticipant(
+    String bibNumber,
+    String name,
+  ) async {
     final response = await http.post(
       Uri.parse(allParticipantUrl),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'bibNumber': bibNumber, 'name': name}),
+      body: jsonEncode({
+        'bibNumber': bibNumber,
+        'name': name,      }),
     );
     if (response.statusCode != HttpStatus.ok) {
       throw Exception('Failed to add participant');
     }
     final newID = jsonDecode(response.body)['name'];
-    return Participant(id: newID, name: name, bibNumber: bibNumber);
+    return Participant(
+      id: newID,
+      name: name,
+      bibNumber: bibNumber,
+    );
   }
 
   @override
