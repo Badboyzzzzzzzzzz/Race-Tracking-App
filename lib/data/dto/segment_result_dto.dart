@@ -6,8 +6,9 @@ class SegmentResultDto {
       id: id,
       bibNumber: json['bibNumber'] as String,
       segmentName: json['segmentName'] as String,
-      duration: Duration(microseconds: json['duration'] as int),
+      elapsedTime: Duration(microseconds: json['elapsedTime'] as int),
       name: json['name'] as String,
+      finishDateTime: DateTime.parse(json['finishDateTime'] as String),
     );
   }
 
@@ -15,8 +16,9 @@ class SegmentResultDto {
     return {
       'bibNumber': segmentResult.bibNumber,
       'segmentName': segmentResult.segmentName,
-      'duration': segmentResult.duration.inMicroseconds,
+      'elapsedTime': segmentResult.elapsedTime.inMicroseconds,
       'name': segmentResult.name,
+      'finishDateTime': segmentResult.finishDateTime.toIso8601String(),
     };
   }
 }

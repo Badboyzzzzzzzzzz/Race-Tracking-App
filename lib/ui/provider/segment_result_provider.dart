@@ -22,7 +22,9 @@ class SegmentResultProvider extends ChangeNotifier {
       notifyListeners();
     } catch (error) {
       _segmentResults = AsyncValue.error(error);
+      print(error);
       notifyListeners();
+      print('segment result ${(segmentResults.data!).length}');
     }
   }
 
@@ -31,6 +33,7 @@ class SegmentResultProvider extends ChangeNotifier {
     String name,
     String segmentName,
     Duration duration,
+    DateTime finishedTime,
   ) async {
     try {
       await _repository.addSegmentResult(
@@ -38,6 +41,7 @@ class SegmentResultProvider extends ChangeNotifier {
         name,
         segmentName,
         duration,
+        finishedTime,
       );
       await fetchSegmentResults();
     } catch (error) {

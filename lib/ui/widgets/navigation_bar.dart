@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:race_tracker/ui/screens/participant_management/home_page.dart';
 import 'package:race_tracker/ui/screens/result_screen/result.dart';
+import 'package:race_tracker/ui/screens/timeController/timer_controller.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/group_segment_screen.dart';
 
 import '../../theme/theme.dart';
-
 
 // ignore_for_file: file_names, deprecated_member_use
 
@@ -40,11 +40,15 @@ class Navigationbar extends StatelessWidget {
             label: 'Home',
           ),
           NavigationDestination(
+            icon: Icon(HugeIcons.strokeRoundedTime03),
+            label: 'Time Controller',
+          ),
+          NavigationDestination(
             icon: Icon(
-              HugeIcons.strokeRoundedTime03,
+              HugeIcons.strokeRoundedGameController01,
               color: currentIndex == 1 ? Colors.blue : Colors.grey,
             ),
-            label: 'Timing',
+            label: 'Race Control',
           ),
           NavigationDestination(
             icon: Icon(
@@ -72,11 +76,17 @@ class Navigationbar extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const TimerScreen(),
+                  builder: (context) => const TimerController(),
                 ),
               );
               break;
             case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TimerScreen()),
+              );
+              break;
+            case 3:
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const ResultScreen()),

@@ -7,6 +7,7 @@ abstract class SegmentResultRepository {
     String name,
     String segmentName,
     Duration duration,
+    DateTime finishedTime,
   );
   Future<void> deleteSegmentResult(String bibNumber, String segmentName);
 }

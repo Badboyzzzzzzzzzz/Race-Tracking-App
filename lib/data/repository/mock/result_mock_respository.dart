@@ -6,16 +6,9 @@
 // class MockSegmentResultRepository implements SegmentResultRepository {
 //   final List<SegmentResult> _segmentResults = segmentResults;
 //   @override
-//   Future<List<SegmentResult>> getSegmentResults(String segmentName) async {
+//   Future<List<SegmentResult>> getSegmentResults() async {
 //     return _segmentResults
-//         .where((result) => result.segmentName == segmentName)
-//         .toList();
-//   }
-
-//   @override
-//   Future<List<SegmentResult>> getParticipantResults(String bibNumber) async {
-//     return _segmentResults
-//         .where((result) => result.bibNumber == bibNumber)
+//         .where((result) => result.segmentName == segmentResults)
 //         .toList();
 //   }
 
@@ -43,14 +36,5 @@
 //       (result) => result.bibNumber == bibNumber && result.segmentName == segmentName,
 //     );
 //   }
-//   @override
-//   Future<SegmentResult?> getSpecificResult(
-//     String bibNumber,
-//     String segmentName,
-//   ) async {
-//     return _segmentResults.firstWhere(
-//       (result) =>
-//           result.bibNumber == bibNumber && result.segmentName == segmentName,
-//     );
-//   }
+
 // }

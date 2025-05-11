@@ -32,8 +32,7 @@ class ParticipantProvider extends ChangeNotifier {
       // Check for duplicate BIB number
       await fetchParticipants();
       final isDuplicate =
-          _participants.data?.any((p) => p.bibNumber == bibNumber) ??
-          false;
+          _participants.data?.any((p) => p.bibNumber == bibNumber) ?? false;
       if (isDuplicate) {
         _participants = AsyncValue.error(
           'BIB number $bibNumber already exists',

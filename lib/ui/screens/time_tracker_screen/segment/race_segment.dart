@@ -1,39 +1,67 @@
-// ignore_for_file: avoid_print
-
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:race_tracker/model/participant.dart';
+import 'package:race_tracker/model/race_result.dart';
 import 'package:race_tracker/theme/theme.dart';
 import 'package:race_tracker/ui/provider/async_values.dart';
 import 'package:race_tracker/ui/provider/participant_provider.dart';
 import 'package:race_tracker/ui/provider/segment_result_provider.dart';
+import 'package:race_tracker/ui/provider/timer_state_provider.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/widget/bib_button.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/widget/search_bar.dart';
-import 'package:race_tracker/ui/widgets/custom_button.dart';
 
-class RunSegment extends StatefulWidget {
-  const RunSegment({super.key});
-
+class RaceSegment extends StatefulWidget {
+  final String segmentType;
+  const RaceSegment({super.key, required this.segmentType});
   @override
-  State<RunSegment> createState() => _RunSegmentScreenState();
+  State<RaceSegment> createState() => _RaceSegmentState();
 }
 
-class _RunSegmentScreenState extends State<RunSegment> {
+class _RaceSegmentState extends State<RaceSegment> {
+  Timer? _timer;
+  String timeDisplay = '00:00:00.00';
   List<String> preselectedBibs = [];
   List<String> confirmedBibs = [];
   Map<String, DateTime> finishTimes = {};
   Map<String, Duration> elapsedTimes = {};
-
-  final Stopwatch _stopwatch = Stopwatch();
-  Timer? _timer;
-  String _timeDisplay = '00:00:00.00';
   String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
+      if (mounted) {
+        setState(() {
+          _updateDisplay();
+        });
+      }
+    });
+  }
+
+  void _updateDisplay() {
+    final timerProvider = context.read<TimerStateProvider>();
+    final duration = timerProvider.getElapsedTime();
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    final milliseconds = ((duration.inMilliseconds % 1000) ~/ 10)
+        .toString()
+        .padLeft(2, '0');
+    setState(() {
+      timeDisplay = '$hours:$minutes:$seconds.$milliseconds';
+    });
   }
 
   Color getBibColor(String bib) {
@@ -46,51 +74,27 @@ class _RunSegmentScreenState extends State<RunSegment> {
     }
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
-      if (_stopwatch.isRunning) {
-        setState(() {
-          _updateDisplay();
-        });
-      }
-    });
-  }
-
-  void _updateDisplay() {
-    final duration = _stopwatch.elapsed;
-    final hours = duration.inHours.toString().padLeft(2, '0');
-    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
-    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    final milliseconds = ((duration.inMilliseconds % 1000) ~/ 10)
-        .toString()
-        .padLeft(2, '0');
-    _timeDisplay = '$hours:$minutes:$seconds.$milliseconds';
-  }
-
   void _handleBibTap(String bib, String name) async {
     final segmentProvider = context.read<SegmentResultProvider>();
+    final timerProvider = context.read<TimerStateProvider>();
 
     setState(() {
       if (confirmedBibs.contains(bib)) {
-        // If already confirmed it do nothing on tap
         return;
       }
       if (preselectedBibs.contains(bib)) {
-        // Second tap confirm and save pariticipant result
         preselectedBibs.remove(bib);
         confirmedBibs.add(bib);
         finishTimes[bib] = DateTime.now();
-        elapsedTimes[bib] = _stopwatch.elapsed;
-        // Save the participant result to Firebase
-        segmentProvider.addResult(bib, name, 'run', _stopwatch.elapsed);
+        elapsedTimes[bib] = timerProvider.getElapsedTime();
+        segmentProvider.addResult(
+          bib,
+          name,
+          widget.segmentType,
+          elapsedTimes[bib]!,
+          finishTimes[bib]!,
+        );
       } else {
-        // First tap on bib to preselect
         preselectedBibs.add(bib);
       }
     });
@@ -128,27 +132,14 @@ class _RunSegmentScreenState extends State<RunSegment> {
           finishTimes.remove(bib);
           elapsedTimes.remove(bib);
         });
-
-        // Delete the result from Firebase
-        await segmentProvider.deleteResult(bib, 'run');
+        await segmentProvider.deleteResult(bib, widget.segmentType);
       }
     }
   }
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitsMs(int n) => (n ~/ 10).toString().padLeft(2, '0');
-
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    final milliseconds = twoDigitsMs(duration.inMilliseconds.remainder(1000));
-    return '$hours:$minutes:$seconds.$milliseconds';
-  }
-
   String getParticipantTime(String bib) {
     if (elapsedTimes.containsKey(bib)) {
-      return _formatDuration(elapsedTimes[bib]!);
+      return SegmentResult.formatDuration(elapsedTimes[bib]!);
     }
     return '';
   }
@@ -156,15 +147,27 @@ class _RunSegmentScreenState extends State<RunSegment> {
   List<Participant> _getFilteredParticipants(
     List<Participant> allParticipants,
   ) {
-    if (_searchQuery.isEmpty) {
-      return allParticipants;
-    }
-    return allParticipants.where((participant) {
-      final bibMatch = participant.bibNumber.toLowerCase().contains(
-        _searchQuery.toLowerCase(),
-      );
-      return bibMatch;
-    }).toList();
+    List<Participant> filtered =
+        _searchQuery.isEmpty
+            ? allParticipants
+            : allParticipants.where((participant) {
+              final bibMatch = participant.bibNumber.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              );
+              return bibMatch;
+            }).toList();
+
+    filtered.sort((a, b) {
+      final aIsPreselected = preselectedBibs.contains(a.bibNumber);
+      final bIsPreselected = preselectedBibs.contains(b.bibNumber);
+
+      if (aIsPreselected && !bIsPreselected) return -1;
+      if (!aIsPreselected && bIsPreselected) return 1;
+      if (aIsPreselected && bIsPreselected) return 0;
+      return 0;
+    });
+
+    return filtered;
   }
 
   void _updateSearchQuery(String query) {
@@ -177,6 +180,7 @@ class _RunSegmentScreenState extends State<RunSegment> {
   Widget build(BuildContext context) {
     final participantProvider = context.watch<ParticipantProvider>();
     final getParticipants = participantProvider.participants;
+    final timerProvider = context.watch<TimerStateProvider>();
 
     Widget content;
     switch (getParticipants.state) {
@@ -209,6 +213,7 @@ class _RunSegmentScreenState extends State<RunSegment> {
                 );
               }).toList(),
         );
+        break;
       case AsyncValueState.empty:
         content = const Center(child: Text('No participants found.'));
         break;
@@ -221,7 +226,6 @@ class _RunSegmentScreenState extends State<RunSegment> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Header
               Row(
                 children: [
                   IconButton(
@@ -232,7 +236,7 @@ class _RunSegmentScreenState extends State<RunSegment> {
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    'Run',
+                    widget.segmentType,
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -247,59 +251,43 @@ class _RunSegmentScreenState extends State<RunSegment> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              // Timer
-              Text(
-                _timeDisplay,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+              StreamBuilder(
+                stream: timerProvider.repository.getTimerState(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final state = snapshot.data!;
+                    final duration = state.getElapsedTime();
+                    final hours = duration.inHours.toString().padLeft(2, '0');
+                    final minutes = (duration.inMinutes % 60)
+                        .toString()
+                        .padLeft(2, '0');
+                    final seconds = (duration.inSeconds % 60)
+                        .toString()
+                        .padLeft(2, '0');
+                    final milliseconds = ((duration.inMilliseconds % 1000) ~/
+                            10)
+                        .toString()
+                        .padLeft(2, '0');
+                    return Text(
+                      '$hours:$minutes:$seconds.$milliseconds',
+                      style: const TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }
+                  return const Text(
+                    '00:00:00.00',
+                    style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                  );
+                },
               ),
               const SizedBox(height: 16),
-              // Search bar
               SearchBibBar(onChanged: _updateSearchQuery),
               const SizedBox(height: 16),
-
-              /// BIB numbers
               Expanded(child: content),
-
-              // Bottom buttons
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: CustomButton(
-                text: 'Start Race',
-                color: TrackerTheme.primary,
-                onPressed: () async {
-                  if (!_stopwatch.isRunning) {
-                    setState(() {
-                      _stopwatch.start();
-                    });
-                  }
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: CustomButton(
-                text: 'Finished',
-                color: TrackerTheme.grey,
-                onPressed: () async {
-                  setState(() {
-                    _stopwatch.stop();
-                    _updateDisplay();
-                  });
-                },
-              ),
-            ),
-          ],
         ),
       ),
     );

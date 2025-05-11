@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:race_tracker/model/race_status.dart';
 import 'package:race_tracker/ui/provider/timer_state_provider.dart';
-import 'package:race_tracker/ui/screens/time_tracker_screen/segment/race_segment.dart';
 import 'package:race_tracker/ui/widgets/custom_button.dart';
 import 'package:race_tracker/ui/widgets/navigation_bar.dart';
 import '../../../theme/theme.dart';
 
-class TimerScreen extends StatefulWidget {
-  const TimerScreen({super.key});
+class TimerController extends StatefulWidget {
+  const TimerController({super.key});
 
   @override
-  State<TimerScreen> createState() => _TimerScreenState();
+  State<TimerController> createState() => _TimerControllerState();
 }
 
-class _TimerScreenState extends State<TimerScreen> {
+class _TimerControllerState extends State<TimerController> {
   Timer? _timer;
   String timeDisplay = '00:00:00.00';
 
@@ -54,35 +54,34 @@ class _TimerScreenState extends State<TimerScreen> {
     });
   }
 
-  Duration getCurrentElapsedTime() {
-    return context.read<TimerStateProvider>().getElapsedTime();
-  }
-
   @override
   Widget build(BuildContext context) {
     final timerProvider = context.watch<TimerStateProvider>();
+    final isRunning = timerProvider.currentState?.isRunning ?? false;
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Race Timer Screen',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: TrackerTheme.primary,
+              ),
+            ),
+            Image.asset('assets/images/logo.png', width: 80, height: 80),
+          ],
+        ),
+      ),
       backgroundColor: TrackerTheme.background,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Race Timer Screen',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: TrackerTheme.primary,
-                  ),
-                ),
-                Image.asset('assets/images/logo.png', width: 100, height: 100),
-              ],
-            ),
-
             StreamBuilder(
               stream: timerProvider.repository.getTimerState(),
               builder: (context, snapshot) {
@@ -115,61 +114,47 @@ class _TimerScreenState extends State<TimerScreen> {
                 );
               },
             ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 80,
-              child: CustomButton(
-                text: 'Swim',
-                color: TrackerTheme.primary,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RaceSegment(segmentType: 'swim'),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 80,
-              child: CustomButton(
-                text: 'Cycle',
-                color: TrackerTheme.primary,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RaceSegment(segmentType: 'cycle'),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 80,
-              child: CustomButton(
-                text: 'Run',
-                color: TrackerTheme.primary,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RaceSegment(segmentType: 'run'),
-                    ),
-                  );
-                },
-              ),
+            const SizedBox(height: 128),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomButton(
+                    text: isRunning ? 'Pause' : 'Start Race',
+                    color: TrackerTheme.primary,
+                    onPressed: () {
+                      if (isRunning) {
+                        timerProvider.stopTimer();
+                      } else {
+                        timerProvider.startTimer();
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: CustomButton(
+                    text: 'Reset',
+                    color: TrackerTheme.grey,
+                    onPressed: () {
+                      if (isRunning) {
+                        timerProvider.stopTimer();
+                      }
+                      // Reset the timer state
+                      final initialState = TimerState(
+                        isRunning: false,
+                        startTime: DateTime.now(),
+                        stopTime: null,
+                      );
+                      timerProvider.repository.updateTimerState(initialState);
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
-      bottomNavigationBar: Navigationbar(currentIndex: 2),
+      bottomNavigationBar: Navigationbar(currentIndex: 1),
     );
   }
 }
