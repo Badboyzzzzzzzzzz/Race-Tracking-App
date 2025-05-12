@@ -4,10 +4,10 @@ import 'package:race_tracker/model/race_result.dart';
 import 'package:race_tracker/ui/provider/async_values.dart';
 
 class SegmentResultProvider extends ChangeNotifier {
-  final SegmentResultRepository _repository;
+  final SegmentResultRepository repository;
   AsyncValue<List<SegmentResult>> _segmentResults = AsyncValue.empty();
 
-  SegmentResultProvider(this._repository) {
+  SegmentResultProvider({required this.repository}) {
     fetchSegmentResults();
   }
 
@@ -17,7 +17,7 @@ class SegmentResultProvider extends ChangeNotifier {
     try {
       _segmentResults = AsyncValue.loading();
       notifyListeners();
-      final results = await _repository.getSegmentResults();
+      final results = await repository.getSegmentResults();
       _segmentResults = AsyncValue.success(results);
       notifyListeners();
     } catch (error) {
@@ -36,7 +36,7 @@ class SegmentResultProvider extends ChangeNotifier {
     DateTime finishedTime,
   ) async {
     try {
-      await _repository.addSegmentResult(
+      await repository.addSegmentResult(
         bibNumber,
         name,
         segmentName,
@@ -52,7 +52,7 @@ class SegmentResultProvider extends ChangeNotifier {
 
   Future<void> deleteResult(String bibNumber, String segmentName) async {
     try {
-      await _repository.deleteSegmentResult(bibNumber, segmentName);
+      await repository.deleteSegmentResult(bibNumber, segmentName);
       await fetchSegmentResults();
     } catch (error) {
       _segmentResults = AsyncValue.error(error);

@@ -61,6 +61,7 @@ class _TimerControllerState extends State<TimerController> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: TrackerTheme.white,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

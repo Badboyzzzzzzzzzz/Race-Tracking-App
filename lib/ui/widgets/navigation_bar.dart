@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:race_tracker/ui/screens/participant_management/home_page.dart';
+import 'package:race_tracker/ui/screens/participant_management/participant_management.dart';
 import 'package:race_tracker/ui/screens/result_screen/result.dart';
 import 'package:race_tracker/ui/screens/timeController/timer_controller.dart';
 import 'package:race_tracker/ui/screens/time_tracker_screen/group_segment_screen.dart';
@@ -40,20 +40,23 @@ class Navigationbar extends StatelessWidget {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(HugeIcons.strokeRoundedTime03),
+            icon: Icon(
+              HugeIcons.strokeRoundedTime03,
+              color: currentIndex == 1 ? Colors.blue : Colors.grey,
+            ),
             label: 'Time Controller',
           ),
           NavigationDestination(
             icon: Icon(
               HugeIcons.strokeRoundedGameController01,
-              color: currentIndex == 1 ? Colors.blue : Colors.grey,
+              color: currentIndex == 2 ? Colors.blue : Colors.grey,
             ),
             label: 'Race Control',
           ),
           NavigationDestination(
             icon: Icon(
               HugeIcons.strokeRoundedGoogleDoc,
-              color: currentIndex == 2 ? Colors.blue : Colors.grey,
+              color: currentIndex == 3 ? Colors.blue : Colors.grey,
             ),
             label: 'Results',
           ),

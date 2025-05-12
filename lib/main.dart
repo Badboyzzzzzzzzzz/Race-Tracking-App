@@ -1,17 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:race_tracker/data/repository/firebase/timer_state_firebase_repository.dart';
-import 'package:race_tracker/data/repository/participant_repository.dart';
-import 'package:race_tracker/data/repository/segment_result_repository.dart';
-import 'package:race_tracker/data/repository/timer_state_repository.dart';
-import 'package:race_tracker/data/repository/firebase/participant_firebase_repository.dart';
 import 'package:race_tracker/data/repository/firebase/segment_result_firebase_repository.dart';
+import 'package:race_tracker/data/repository/firebase/timer_state_firebase_repository.dart';
+import 'package:race_tracker/data/repository/firebase/participant_firebase_repository.dart';
 import 'package:race_tracker/firebase_options.dart';
 import 'package:race_tracker/ui/provider/participant_provider.dart';
 import 'package:race_tracker/ui/provider/segment_result_provider.dart';
 import 'package:race_tracker/ui/provider/timer_state_provider.dart';
-import 'package:race_tracker/ui/screens/participant_management/home_page.dart';
+import 'package:race_tracker/ui/screens/participant_management/participant_management.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,31 +16,23 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        Provider<ParticipantRepository>(
-          create: (context) => ParticipantRepositoryFirebase(),
-        ),
-        Provider<SegmentResultRepository>(
-          create: (context) => SegmentResultRepositoryFirebase(),
-        ),
-        Provider<TimerStateRepository>(
-          create: (context) => FirebaseTimerStateRepository(),
-        ),
         ChangeNotifierProvider(
           create:
               (context) => ParticipantProvider(
-                participantRepository: context.read<ParticipantRepository>(),
+                participantRepository: ParticipantRepositoryFirebase(),
               ),
         ),
         ChangeNotifierProvider(
           create:
               (context) => SegmentResultProvider(
-                context.read<SegmentResultRepository>(),
+                repository: SegmentResultRepositoryFirebase(),
               ),
         ),
         ChangeNotifierProvider(
           create:
-              (context) =>
-                  TimerStateProvider(context.read<TimerStateRepository>()),
+              (context) => TimerStateProvider(
+                repository: FirebaseTimerStateRepository(),
+              ),
         ),
       ],
       child: const MyApp(),

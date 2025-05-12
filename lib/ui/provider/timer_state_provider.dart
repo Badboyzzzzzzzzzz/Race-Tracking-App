@@ -8,7 +8,7 @@ class TimerStateProvider extends ChangeNotifier {
   TimerState? _currentState;
   StreamSubscription<TimerState>? _subscription;
 
-  TimerStateProvider(this.repository) {
+  TimerStateProvider({required this.repository}) {
     _subscription = repository.getTimerState().listen((state) {
       _currentState = state;
       notifyListeners();
@@ -22,7 +22,6 @@ class TimerStateProvider extends ChangeNotifier {
   }
 
   TimerState? get currentState => _currentState;
-
   Duration getElapsedTime() {
     return _currentState?.getElapsedTime() ?? Duration.zero;
   }
@@ -30,7 +29,17 @@ class TimerStateProvider extends ChangeNotifier {
   Future<void> startTimer() async {
     if (_currentState?.isRunning ?? false) return;
 
-    final newState = TimerState(isRunning: true, startTime: DateTime.now());
+    // If there was a previous state, calculate the total elapsed time
+    Duration previousElapsedTime = Duration.zero;
+    if (_currentState != null) {
+      previousElapsedTime = _currentState!.getElapsedTime();
+    }
+
+    // Create new state with adjusted start time to account for previous elapsed time
+    final newState = TimerState(
+      isRunning: true,
+      startTime: DateTime.now().subtract(previousElapsedTime),
+    );
     await repository.updateTimerState(newState);
   }
 

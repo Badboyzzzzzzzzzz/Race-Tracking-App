@@ -62,27 +62,30 @@ class _TimerScreenState extends State<TimerScreen> {
   Widget build(BuildContext context) {
     final timerProvider = context.watch<TimerStateProvider>();
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: TrackerTheme.white,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Race Timer Screen',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: TrackerTheme.primary,
+              ),
+            ),
+            Image.asset('assets/images/logo.png', width: 80, height: 80),
+          ],
+        ),
+      ),
       backgroundColor: TrackerTheme.background,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Race Timer Screen',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: TrackerTheme.primary,
-                  ),
-                ),
-                Image.asset('assets/images/logo.png', width: 100, height: 100),
-              ],
-            ),
-
             StreamBuilder(
               stream: timerProvider.repository.getTimerState(),
               builder: (context, snapshot) {

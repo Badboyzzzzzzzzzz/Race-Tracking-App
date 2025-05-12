@@ -157,15 +157,15 @@ class _RaceSegmentState extends State<RaceSegment> {
               return bibMatch;
             }).toList();
 
-    filtered.sort((a, b) {
-      final aIsPreselected = preselectedBibs.contains(a.bibNumber);
-      final bIsPreselected = preselectedBibs.contains(b.bibNumber);
+    // filtered.sort((a, b) {
+    //   final aIsPreselected = preselectedBibs.contains(a.bibNumber);
+    //   final bIsPreselected = preselectedBibs.contains(b.bibNumber);
 
-      if (aIsPreselected && !bIsPreselected) return -1;
-      if (!aIsPreselected && bIsPreselected) return 1;
-      if (aIsPreselected && bIsPreselected) return 0;
-      return 0;
-    });
+    //   if (aIsPreselected && !bIsPreselected) return -1;
+    //   if (!aIsPreselected && bIsPreselected) return 1;
+    //   if (aIsPreselected && bIsPreselected) return 0;
+    //   return 0;
+    // });
 
     return filtered;
   }

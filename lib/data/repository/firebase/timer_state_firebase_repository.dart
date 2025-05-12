@@ -23,7 +23,6 @@ class FirebaseTimerStateRepository implements TimerStateRepository {
         await _database.child(_path).set(TimerStateDto.toJson(initialState));
       }
     } catch (e) {
-      print('Error initializing timer state: $e');
       final initialState = TimerState(
         isRunning: false,
         startTime: DateTime.now(),
@@ -47,7 +46,6 @@ class FirebaseTimerStateRepository implements TimerStateRepository {
         final data = Map<String, dynamic>.from(event.snapshot.value as Map);
         return TimerStateDto.fromJson(data);
       } catch (e) {
-        print('Error parsing timer state: $e');
         return TimerState(
           isRunning: false,
           startTime: DateTime.now(),
