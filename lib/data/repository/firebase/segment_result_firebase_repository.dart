@@ -21,13 +21,11 @@ class SegmentResultRepositoryFirebase implements SegmentResultRepository {
         Uri.parse('$baseUrl/$segmentResultsCollection.json'),
         headers: {'Content-Type': 'application/json'},
       );
-
       if (response.statusCode != HttpStatus.ok) {
         throw Exception(
           'Failed to fetch segment results: ${response.statusCode}',
         );
       }
-
       final Map<String, dynamic> data = jsonDecode(response.body) ?? {};
       return data.entries
           .map((entry) {

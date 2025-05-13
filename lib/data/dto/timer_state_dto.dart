@@ -5,10 +5,8 @@ class TimerStateDto {
     // Use server timestamp if available, otherwise fall back to client time
     final startTimeStr = json['startTime'] as String;
     final stopTimeStr = json['stopTime'] as String?;
-
     DateTime startTime;
     DateTime? stopTime;
-
     try {
       startTime = DateTime.parse(startTimeStr);
     } catch (e) {
@@ -23,7 +21,6 @@ class TimerStateDto {
         stopTime = null;
       }
     }
-
     return TimerState(
       isRunning: json['isRunning'] as bool,
       startTime: startTime,

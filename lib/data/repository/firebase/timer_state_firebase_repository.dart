@@ -60,7 +60,6 @@ class FirebaseTimerStateRepository implements TimerStateRepository {
     try {
       await _database.child(_path).set(TimerStateDto.toJson(state));
     } catch (e) {
-      print('Error updating timer state: $e');
       rethrow;
     }
   }

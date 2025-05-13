@@ -24,7 +24,6 @@ class SegmentResultProvider extends ChangeNotifier {
       _segmentResults = AsyncValue.error(error);
       print(error);
       notifyListeners();
-      print('segment result ${(segmentResults.data!).length}');
     }
   }
 

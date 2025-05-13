@@ -7,10 +7,14 @@ class TimerStateProvider extends ChangeNotifier {
   final TimerStateRepository repository;
   TimerState? _currentState;
   StreamSubscription<TimerState>? _subscription;
+  Duration _elapsedTime = Duration.zero;
 
   TimerStateProvider({required this.repository}) {
     _subscription = repository.getTimerState().listen((state) {
       _currentState = state;
+      if (!state.isRunning && state.stopTime != null) {
+        _elapsedTime = state.stopTime!.difference(state.startTime);
+      }
       notifyListeners();
     });
   }
@@ -22,23 +26,25 @@ class TimerStateProvider extends ChangeNotifier {
   }
 
   TimerState? get currentState => _currentState;
+
   Duration getElapsedTime() {
-    return _currentState?.getElapsedTime() ?? Duration.zero;
+    if (_currentState == null) return Duration.zero;
+
+    if (_currentState!.isRunning) {
+      return DateTime.now().difference(_currentState!.startTime);
+    } else {
+      return _elapsedTime;
+    }
   }
 
   Future<void> startTimer() async {
     if (_currentState?.isRunning ?? false) return;
 
-    // If there was a previous state, calculate the total elapsed time
-    Duration previousElapsedTime = Duration.zero;
-    if (_currentState != null) {
-      previousElapsedTime = _currentState!.getElapsedTime();
-    }
-
-    // Create new state with adjusted start time to account for previous elapsed time
+    final now = DateTime.now();
     final newState = TimerState(
       isRunning: true,
-      startTime: DateTime.now().subtract(previousElapsedTime),
+      startTime: now.subtract(_elapsedTime),
+      stopTime: null,
     );
     await repository.updateTimerState(newState);
   }
@@ -46,10 +52,23 @@ class TimerStateProvider extends ChangeNotifier {
   Future<void> stopTimer() async {
     if (!(_currentState?.isRunning ?? false)) return;
 
+    final now = DateTime.now();
+    _elapsedTime = now.difference(_currentState!.startTime);
+
     final newState = TimerState(
       isRunning: false,
       startTime: _currentState!.startTime,
-      stopTime: DateTime.now(),
+      stopTime: now,
+    );
+    await repository.updateTimerState(newState);
+  }
+
+  Future<void> resetTimer() async {
+    _elapsedTime = Duration.zero;
+    final newState = TimerState(
+      isRunning: false,
+      startTime: DateTime.now(),
+      stopTime: null,
     );
     await repository.updateTimerState(newState);
   }

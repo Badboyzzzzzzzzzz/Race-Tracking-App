@@ -138,7 +138,7 @@ class _TimerControllerState extends State<TimerController> {
                     color: TrackerTheme.grey,
                     onPressed: () {
                       if (isRunning) {
-                        timerProvider.stopTimer();
+                        timerProvider.resetTimer();
                       }
                       // Reset the timer state
                       final initialState = TimerState(

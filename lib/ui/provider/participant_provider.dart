@@ -29,7 +29,7 @@ class ParticipantProvider extends ChangeNotifier {
 
   Future<bool> addParticipant(String bibNumber, String name) async {
     try {
-      // Check for duplicate BIB number
+      /// Check for duplicate BIB number
       await fetchParticipants();
       final isDuplicate =
           _participants.data?.any((p) => p.bibNumber == bibNumber) ?? false;
@@ -41,7 +41,7 @@ class ParticipantProvider extends ChangeNotifier {
         return false;
       }
 
-      // If no duplicate, proceed with adding
+      /// If no duplicate, proceed with adding
       await participantRepository.addParticipant(bibNumber, name);
       await fetchParticipants(); // Refresh the list
       return true;
