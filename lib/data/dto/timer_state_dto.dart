@@ -17,7 +17,6 @@ class TimerStateDto {
       try {
         stopTime = DateTime.parse(stopTimeStr);
       } catch (e) {
-        print('Error parsing stopTime: $e');
         stopTime = null;
       }
     }

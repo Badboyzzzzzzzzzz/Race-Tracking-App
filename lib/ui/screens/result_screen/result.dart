@@ -12,11 +12,12 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final segmentResult = context.watch<SegmentResultProvider>().segmentResults;
+
     Future<void> handleRefresh() async {
-      await Future.delayed(const Duration(seconds: 2));
+      await context.read<SegmentResultProvider>().fetchSegmentResults();
     }
 
-    final segmentResult = context.watch<SegmentResultProvider>().segmentResults;
     Widget result;
     switch (segmentResult.state) {
       case AsyncValueState.loading:
